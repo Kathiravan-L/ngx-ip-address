@@ -1,0 +1,61 @@
+{
+  "_from": "ngx-ip-address@3.0.2",
+  "_id": "ngx-ip-address@3.0.2",
+  "_inBundle": false,
+  "_integrity": "sha512-CQ5i/IKYuczbAWBMc2QeXPHZBQaFMGoeZKqsAaZKSVUIHwXpYYODY65hKU51egAQ4HKo324K2e3nsNQdBeatEw==",
+  "_location": "/ngx-ip-address",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "ngx-ip-address@3.0.2",
+    "name": "ngx-ip-address",
+    "escapedName": "ngx-ip-address",
+    "rawSpec": "3.0.2",
+    "saveSpec": null,
+    "fetchSpec": "3.0.2"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/ngx-ip-address/-/ngx-ip-address-3.0.2.tgz",
+  "_shasum": "c0787f961f41573a12fbb4ef11a2e476ecd58b9c",
+  "_spec": "ngx-ip-address@3.0.2",
+  "_where": "E:\\Ventus Networks\\Router_SVN_26_10_2018_New",
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/Kathiravan-L/ngx-ip-address/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "An angular network address (IPv4, IPv6 and MAC) input component",
+  "es2015": "dist/ngx-ip.js",
+  "homepage": "https://github.com/Kathiravan-L/ngx-ip-address#readme",
+  "keywords": [
+    "angular",
+    "component",
+    "network",
+    "address",
+    "ip",
+    "ipv4",
+    "ipv6",
+    "mac"
+  ],
+  "license": "MIT",
+  "main": "dist/ngx-ip.umd.js",
+  "metadata": "src/ngx-ip.ng-flat.metadata.json",
+  "module": "dist/ngx-ip.es5.js",
+  "name": "ngx-ip-address",
+  "peerDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kathiravan-L/ngx-ip-address.git"
+  },
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "typings": "src/ngx-ip.ng-flat.d.ts",
+  "version": "1.0.0"
+}
