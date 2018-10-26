@@ -16,10 +16,7 @@ Support paste (single value or whole address)
 Support copy block or address
 Disable specific blocks
 Highlight invalid blocks (does not replace validation)
-Themes
-Implements OnPush
-Supports AOT
-Angular packaging format included (FESM, FESM2015, UMD)
+
 
 
 Credits: https://github.com/shlomiassaf/ngx-ip
