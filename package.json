@@ -1,29 +1,31 @@
 {
-  "_from": "ngx-ip-address@3.0.2",
-  "_id": "ngx-ip-address@3.0.2",
+  "_from": "ngx-ip-address@1.0.1",
+  "_id": "ngx-ip-address@1.0.1",
   "_inBundle": false,
-  "_integrity": "sha512-CQ5i/IKYuczbAWBMc2QeXPHZBQaFMGoeZKqsAaZKSVUIHwXpYYODY65hKU51egAQ4HKo324K2e3nsNQdBeatEw==",
+  "_integrity": "sha512-xnM0j5BQr9G+vSANRQYBfwoRjm4B81w+EfB54ORYMQMqZcz24JA5DxhOxqdE9QI3xYjwDc+HtBNXqlIIfPou8w==",
   "_location": "/ngx-ip-address",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "ngx-ip-address@3.0.2",
+    "raw": "ngx-ip-address@1.0.1",
     "name": "ngx-ip-address",
     "escapedName": "ngx-ip-address",
-    "rawSpec": "3.0.2",
+    "rawSpec": "1.0.1",
     "saveSpec": null,
-    "fetchSpec": "3.0.2"
+    "fetchSpec": "1.0.1"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/ngx-ip-address/-/ngx-ip-address-3.0.2.tgz",
-  "_shasum": "c0787f961f41573a12fbb4ef11a2e476ecd58b9c",
-  "_spec": "ngx-ip-address@3.0.2",
-  "_where": "E:\\Ventus Networks\\Router_SVN_26_10_2018_New",
-  "author": "",
+  "_resolved": "https://registry.npmjs.org/ngx-ip-address/-/ngx-ip-address-1.0.1.tgz",
+  "_shasum": "4da0dfe4d5d0d3483d53c3d99b6cdedc1f7f59dd",
+  "_spec": "ngx-ip-address@1.0.1",
+  "_where": "E:\\Ventus Networks\\Router_SVN_26_10_2018",
+  "author": {
+    "name": "Kathiravan"
+  },
   "bugs": {
     "url": "https://github.com/Kathiravan-L/ngx-ip-address/issues"
   },
@@ -31,7 +33,7 @@
   "dependencies": {},
   "deprecated": false,
   "description": "An angular network address (IPv4, IPv6 and MAC) input component",
-  "es2015": "dist/ngx-ip.js",
+  "es2015": "dist/ngx-ip-address.js",
   "homepage": "https://github.com/Kathiravan-L/ngx-ip-address#readme",
   "keywords": [
     "angular",
@@ -44,9 +46,9 @@
     "mac"
   ],
   "license": "MIT",
-  "main": "dist/ngx-ip.umd.js",
-  "metadata": "src/ngx-ip.ng-flat.metadata.json",
-  "module": "dist/ngx-ip.es5.js",
+  "main": "dist/ngx-ip-address.umd.js",
+  "metadata": "src/ngx-ip-address.ng-flat.metadata.json",
+  "module": "dist/ngx-ip-address.es5.js",
   "name": "ngx-ip-address",
   "peerDependencies": {},
   "repository": {
@@ -56,6 +58,6 @@
   "scripts": {
     "prepublish": "tsc"
   },
-  "typings": "src/ngx-ip.ng-flat.d.ts",
-  "version": "1.0.0"
+  "typings": "src/ngx-ip-address.ng-flat.d.ts",
+  "version": "1.0.2"
 }

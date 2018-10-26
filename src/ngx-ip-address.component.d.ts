@@ -1,5 +1,5 @@
 import { ChangeDetectorRef } from '@angular/core';
-import { NgxIpBase, COPY_METHOD } from './ngx-ip.base';
+import { NgxIpBase, COPY_METHOD } from './ngx-ip-address.base';
 export declare const ADDRESS_CONTROL_VALUE_ACCESSOR: any;
 export declare const ADDRESS_CONTROL_VALIDATORS: any;
 export declare class NgxIpComponent extends NgxIpBase {
@@ -8,7 +8,7 @@ export declare class NgxIpComponent extends NgxIpBase {
     inputAnim: string;
     private _highlightInvalidBlocks;
     /**
-     * When true add's the 'ngx-ip-error' class to the block when it's invalid.
+     * When true add's the 'ngx-ip-address-error' class to the block when it's invalid.
      * @param value
      */
     highlightInvalidBlocks: boolean;
