@@ -84,7 +84,7 @@ var v4 = {
 };
 var v4WithMask = Object.assign(Object.create(v4), {
     BLOCK_COUNT: 5,
-    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|30)$/]),
+    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|32)$/]),
     /**
      * @return {?}
      */

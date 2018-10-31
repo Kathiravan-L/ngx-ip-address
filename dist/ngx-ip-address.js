@@ -71,7 +71,7 @@ const v4 = {
 };
 const v4WithMask = Object.assign(Object.create(v4), {
     BLOCK_COUNT: 5,
-    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|30)$/]),
+    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|32)$/]),
     /**
      * @return {?}
      */
@@ -704,6 +704,7 @@ class NgxIpBase {
      * @return {?}
      */
     onKeyUp($event, idx) {
+        console.log(this.isBackspace($event))
         if (this.isBackspace($event)) {
             const /** @type {?} */ input = /** @type {?} */ ($event.target);
             const /** @type {?} */ value = input && input.selectionStart >= 0 && input.selectionEnd > input.selectionStart

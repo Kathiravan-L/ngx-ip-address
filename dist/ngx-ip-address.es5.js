@@ -82,7 +82,7 @@ var v4 = {
 };
 var v4WithMask = Object.assign(Object.create(v4), {
     BLOCK_COUNT: 5,
-    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|30)$/]),
+    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|32)$/]),
     /**
      * @return {?}
      */
@@ -128,6 +128,71 @@ var v4WithMask = Object.assign(Object.create(v4), {
         }
         var /** @type {?} */ value = parseInt(blocks[4], 10);
         return value >= 0 && value <= 30;
+    },
+    /**
+     * @param {?} value
+     * @return {?}
+     */
+    isMaxLen: function (value) {
+        if (value.length === 3) {
+            return true;
+        }
+        else if (value.length === 2 && parseInt(value, 10) > 25) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+});
+
+var v4WithCIDROptional = Object.assign(Object.create(v4), {
+    BLOCK_COUNT: 5,
+    RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|32)?$/]),
+    /**
+     * @return {?}
+     */
+    blocks: function () { return ['', '', '', '', '']; },
+    /**
+     * @param {?} blocks
+     * @param {?=} sep
+     * @return {?}
+     */
+    fromBlocks: function (blocks, sep) {
+        if (sep === void 0) { sep = v4.SEP; }
+        if(blocks[4].length == 0){
+            return blocks.slice(0, 4).join(sep);
+        }else{
+            return blocks.slice(0, 4).join(sep) + ("/" + blocks[4]);
+        }
+        
+    },
+    /**
+     * @param {?} value
+     * @param {?=} sep
+     * @param {?=} throwError
+     * @return {?}
+     */
+    split: function (value, sep, throwError) {
+        if (sep === void 0) { sep = v4.SEP; }
+        if (throwError === void 0) { throwError = false; }
+        if (!value) {
+            return v4WithCIDROptional.blocks();
+        }
+        var /** @type {?} */ result = value.split(sep);
+        result.push.apply(result, result.pop().split('/'));
+        if (throwError && result.length !== v4WithCIDROptional.BLOCK_COUNT) {
+            throw new Error('Invalid IPV4 with Mask Optional');
+        }
+        return result;
+    },
+    /**
+     * @param {?} blocks
+     * @return {?}
+     */
+  
+    isValid: function (blocks) {
+        return blocks.every(function (value) { return parseInt(value, 10) >= 0 && parseInt(value, 10) <= 255; });
     },
     /**
      * @param {?} value
@@ -209,6 +274,76 @@ var v6 = {
         return value.length === 4;
     }
 };
+
+
+var v6WithSubnetMask = Object.assign(Object.create(v6), {
+    BLOCK_COUNT: 9,
+    RE_BLOCK: v6.RE_BLOCK.concat([/^([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$/]),
+    /**
+     * @return {?}
+     */
+    blocks: function () { return ['', '', '', '', '','', '', '', '']; },
+    /**
+     * @param {?} blocks
+     * @param {?=} sep
+     * @return {?}
+     */
+    fromBlocks: function (blocks, sep) {
+        if (sep === void 0) { sep = v6.SEP; }
+        return blocks.map(function (value,key) {
+            if(key == 8){
+                return value ? value : '00'; 
+            }else{
+                return value ? value : '0000'; 
+            }
+        }).join(sep);
+        
+    },
+    /**
+     * @param {?} value
+     * @param {?=} sep
+     * @param {?=} throwError
+     * @return {?}
+     */
+
+    split: function (value, sep, throwError) {
+        if (sep === void 0) { sep = v6.SEP; }
+        if (throwError === void 0) { throwError = false; }
+        if (!value) {
+            return v6WithSubnetMask.blocks();
+        }
+        var /** @type {?} */ consecutiveSplit = value.split(sep + sep);
+        var /** @type {?} */ result = consecutiveSplit[0].split(sep);
+        if (consecutiveSplit.length === 2) {
+            var /** @type {?} */ rightPart = consecutiveSplit[1].split(sep);
+            var /** @type {?} */ emptySpaces = v6WithSubnetMask.BLOCK_COUNT - (result.length + rightPart.length);
+            result.splice.apply(result, [result.length, 0].concat(v6WithSubnetMask.blocks().slice(0, emptySpaces)));
+            result.splice.apply(result, [result.length, 0].concat(rightPart));
+        }
+        result.push.apply(result, result.pop().split('/'));
+        // consecutive :: allowed once.
+        if (throwError && (consecutiveSplit.length > 2 || result.length !== v6WithSubnetMask.BLOCK_COUNT)) {
+            throw new Error('Invalid IPV6 With Subnet Mask');
+        }
+        return result;
+    },
+
+    /**
+     * @param {?} blocks
+     * @return {?}
+     */
+     isValid: function (blocks) {
+        return blocks.every(function (value) { return V6_BLOCK_RE.test(value); }) && blocks.some(function (value) { return !!value; });
+    },
+    /**
+     * @param {?} value
+     * @return {?}
+     */
+    isMaxLen: function (value) {
+        return value.length === 4;
+    }
+});
+
 var MAC_BLOCK_RE = /^[0-9A-Fa-f]{1,2}$/;
 var mac = Object.assign(Object.create(v6), {
     BLOCK_MAX_LEN: 2,
@@ -322,10 +457,12 @@ function cancelEvent($event) {
     $event.stopPropagation();
 }
 var MODE_MAP = {
-    'ipv6': v6,
-    'mac': mac,
+    'ipv4': v4,
     'ipv4WithMask': v4WithMask,
-    'ipv4': v4
+    'ipv4WithCIDROptional': v4WithCIDROptional,
+    'ipv6': v6,
+    'ipv6WithSubnetMask': v6WithSubnetMask,
+    'mac': mac,
 };
 var NgxIpBase = (function () {
     /**
@@ -487,13 +624,14 @@ var NgxIpBase = (function () {
             this._separator = value;
             this.separatorMap = this.addr.blocks().map(function (b) { return value; });
             this.separatorMap[this.addr.BLOCK_COUNT - 1] = '';
-            if (this.addr === v4WithMask) {
+            if (this.addr === v4WithMask || this.addr === v4WithCIDROptional || this.addr === v6WithSubnetMask) {
                 this.separatorMap[this.addr.BLOCK_COUNT - 2] = '/';
             }
         },
         enumerable: true,
         configurable: true
     });
+
     Object.defineProperty(NgxIpBase.prototype, "disabled", {
         /**
          * @return {?}
@@ -558,6 +696,9 @@ var NgxIpBase = (function () {
      * @param {?} c
      * @return {?}
      */
+
+    NgxIpBase.prototype.propagateChange = (_) => { };
+
     NgxIpBase.prototype.validate = function (c) {
         if (this.required && this.fullBlocks === this.emptyFlag) {
             return { required: true };
@@ -753,13 +894,13 @@ var NgxIpBase = (function () {
      * @return {?}
      */
     NgxIpBase.prototype.onKeyUp = function ($event, idx) {
-        if (this.isBackspace($event)) {
+        // if (this.isBackspace($event)) {
             var /** @type {?} */ input = ($event.target);
             var /** @type {?} */ value = input && input.selectionStart >= 0 && input.selectionEnd > input.selectionStart
                 ? input.value.substr(0, input.selectionStart) + input.value.substr(input.selectionEnd)
                 : input.value.substr(0, input.value.length - 1);
             this.markBlockValidity(value, idx);
-        }
+        // }s
     };
     /**
      * @param {?} idx
