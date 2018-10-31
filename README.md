@@ -1,5 +1,5 @@
 # ngx-ip-address
-Angular network address (IPv4,IPv4 Subnet mask, IPv6 and MAC) input component.
+Angular network address (IPv4,IPv4 Subnet mask,IPv4 Subnet mask Optional, IPv6 Subnet mask, and MAC) input component.
 
 Install:
 
