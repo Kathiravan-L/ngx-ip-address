@@ -1,33 +1,32 @@
 {
   "_args": [
     [
-      "ngx-ip-address@1.0.12",
+      "ngx-ip-address@1.0.9",
       "E:\\Ventus Networks\\Router_SVN"
     ]
   ],
-  "_from": "ngx-ip-address@1.0.12",
-  "_id": "ngx-ip-address@1.0.12",
+  "_from": "ngx-ip-address@^2.0.0",
+  "_id": "ngx-ip-address@2.0.0",
   "_inBundle": false,
-  "_integrity": "sha512-Zbec7vwtuek6vWwmBxxBgXcjR8t6njlxUz37lLCQngNodu+/lPuS2t1JQ9NIoQmrS22aCdROxDbeF6ewpIM1PA==",
+  "_integrity": "sha512-2ExxT6waAhvFMx1RWS8a7tqiCpWyUkD5Xs01OsR3hRfG3IJkCgEkJklKDLYVs+yX15OzZ6dfWwXIFaPXruFP7A==",
   "_location": "/ngx-ip-address",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "ngx-ip-address@1.0.12",
+    "raw": "ngx-ip-address@^2.0.0",
     "name": "ngx-ip-address",
     "escapedName": "ngx-ip-address",
-    "rawSpec": "1.0.12",
+    "rawSpec": "^2.0.0",
     "saveSpec": null,
-    "fetchSpec": "1.0.12"
+    "fetchSpec": "^2.0.0"
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/ngx-ip-address/-/ngx-ip-address-1.0.12.tgz",
-  "_shasum": "1085d661cc798d27b2cb2f20cc899d28234b7d67",
-  "_spec": "ngx-ip-address@1.0.12",
+  "_resolved": "https://registry.npmjs.org/ngx-ip-address/-/ngx-ip-address-2.0.0.tgz",
+  "_shasum": "f0b17d069c6586d4b94cce587fb7f64c8effb24f",
+  "_spec": "ngx-ip-address@^2.0.0",
   "_where": "E:\\Ventus Networks\\Router_SVN",
   "author": {
     "name": "Kathiravan"
@@ -65,5 +64,5 @@
     "prepublish": "tsc"
   },
   "typings": "src/ngx-ip-address.ng-flat.d.ts",
-  "version": "1.0.14"
+  "version": "2.0.0"
 }

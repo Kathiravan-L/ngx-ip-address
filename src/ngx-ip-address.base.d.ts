@@ -1,7 +1,7 @@
 import { EventEmitter, QueryList, ElementRef, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { AbstractControl, ValidationErrors, ControlValueAccessor, Validator } from '@angular/forms';
 import { AddressModeLogic } from './utils';
-export declare type ADDRESS_MODE_TYPE = 'ipv4' | 'ipv4WithMask' | 'ipv4WithCIDROptional' | 'ipv6' | 'ipv6WithSubnetMask' | 'mac';
+export declare type ADDRESS_MODE_TYPE = 'ipv4' | 'netmask' |'ipv4WithMask' | 'ipv4WithCIDROptional' | 'ipv6' | 'ipv6WithSubnetMask' | 'mac';
 export declare type COPY_METHOD = 'block' | 'address';
 export declare type COPY_MODE_TYPE = 'block' | 'address' | 'select';
 export declare type VALIDATION_TYPE = 'none' | 'char' | 'block';
@@ -14,7 +14,7 @@ export declare class NgxIpBase implements OnChanges, ControlValueAccessor, Valid
     focused: any;
     /**
      * IP format.
-     * Valid values: 'ipv4', 'ipv6' or 'mac'
+     * Valid values: 'ipv4', 'ipv4WithMask', 'ipv4WithCIDROptional', ipv6', 'ipv6WithSubnetMask' or 'mac'
      * @param mode
      */
     mode: ADDRESS_MODE_TYPE;

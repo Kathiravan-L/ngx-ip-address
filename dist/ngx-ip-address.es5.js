@@ -80,6 +80,68 @@ var v4 = {
         }
     }
 };
+
+var NETMASK_BLOCK_RE = /^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/;
+var netmask = {
+    BLOCK_COUNT: 4,
+    SEP: '.',
+    RE_CHAR: /^[0-9]$/,
+    RE_BLOCK: [NETMASK_BLOCK_RE, NETMASK_BLOCK_RE, NETMASK_BLOCK_RE, NETMASK_BLOCK_RE],
+    /**
+     * @return {?}
+     */
+    blocks: function () { return ['', '', '', '']; },
+    /**
+     * @param {?} blocks
+     * @param {?=} sep
+     * @return {?}
+     */
+    fromBlocks: function (blocks, sep) {
+        if (sep === void 0) { sep = netmask.SEP; }
+        return blocks.join(sep);
+    },
+    /**
+     * @param {?} value
+     * @param {?=} sep
+     * @param {?=} throwError
+     * @return {?}
+     */
+    split: function (value, sep, throwError) {
+        if (sep === void 0) { sep = netmask.SEP; }
+        if (throwError === void 0) { throwError = false; }
+        if (!value) {
+            return netmask.blocks();
+        }
+        var /** @type {?} */ result = value.split(sep);
+        if (throwError && result.length !== netmask.BLOCK_COUNT) {
+            throw new Error('Invalid Netmask');
+        }
+        return result;
+    },
+    /**
+     * @param {?} blocks
+     * @return {?}
+     */
+    isValid: function (blocks) {
+        return blocks.every(function (value) { return parseInt(value, 10) >= 0 && parseInt(value, 10) <= 255; });
+    },
+    /**
+     * @param {?} value
+     * @return {?}
+     */
+    isMaxLen: function (value) {
+        if (value.length === 3) {
+            return true;
+        }
+        else if (value.length === 2 && parseInt(value, 10) > 25) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+};
+
 var v4WithMask = Object.assign(Object.create(v4), {
     BLOCK_COUNT: 5,
     RE_BLOCK: v4.RE_BLOCK.concat([/^([0-2]?[0-9]|32)$/]),
@@ -145,6 +207,7 @@ var v4WithMask = Object.assign(Object.create(v4), {
         }
     }
 });
+
 
 var v4WithCIDROptional = Object.assign(Object.create(v4), {
     BLOCK_COUNT: 5,
@@ -290,13 +353,14 @@ var v6WithSubnetMask = Object.assign(Object.create(v6), {
      */
     fromBlocks: function (blocks, sep) {
         if (sep === void 0) { sep = v6.SEP; }
-        return blocks.map(function (value,key) {
-            if(key == 8){
-                return value ? value : '00'; 
-            }else{
-                return value ? value : '0000'; 
-            }
-        }).join(sep);
+        return blocks.slice(0, 8).join(sep) + ("/" + blocks[8]);
+        // return blocks.map(function (value,key) {
+        //     if(key == 8){
+        //         return value ? value : '00'; 
+        //     }else{
+        //         return value ? value : '0000'; 
+        //     }
+        // }).join(sep);
         
     },
     /**
@@ -458,6 +522,7 @@ function cancelEvent($event) {
 }
 var MODE_MAP = {
     'ipv4': v4,
+    'netmask': netmask,
     'ipv4WithMask': v4WithMask,
     'ipv4WithCIDROptional': v4WithCIDROptional,
     'ipv6': v6,
@@ -697,13 +762,19 @@ var NgxIpBase = (function () {
      * @return {?}
      */
 
-    NgxIpBase.prototype.propagateChange = (_) => { };
-
     NgxIpBase.prototype.validate = function (c) {
         if (this.required && this.fullBlocks === this.emptyFlag) {
             return { required: true };
         }
-        if (this.errorCount > 0) {
+        if(this.errorCount == 0 && this._mode == 'netmask'){
+            if (
+                c.value.match(/^$|(((255\.){3}(255|254|252|248|240|224|192|128|0+))|((255\.){2}(255|254|252|248|240|224|192|128|0+)\.0)|((255\.)(255|254|252|248|240|224|192|128|0+)(\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\.0+){3}))$/)) {
+                return null;
+              } else {
+                return { NgxIpControl: 'Invalid address' };
+              }
+        }
+        else if (this.errorCount > 0) {
             return { NgxIpControl: 'Invalid address' };
         }
         else {
@@ -888,19 +959,29 @@ var NgxIpBase = (function () {
             setTimeout(function () { return _this.focusNext(idx, false); });
         }
     };
+ 
     /**
      * @param {?} $event
      * @param {?} idx
+     * @param {?=} selectRange
      * @return {?}
      */
     NgxIpBase.prototype.onKeyUp = function ($event, idx) {
-        // if (this.isBackspace($event)) {
             var /** @type {?} */ input = ($event.target);
             var /** @type {?} */ value = input && input.selectionStart >= 0 && input.selectionEnd > input.selectionStart
                 ? input.value.substr(0, input.selectionStart) + input.value.substr(input.selectionEnd)
                 : input.value.substr(0, input.value.length - 1);
+                
             this.markBlockValidity(value, idx);
-        // }s
+
+        if (this.isBackspace($event)) {
+            if(input.value.length == 0){
+                var /** @type {?} */ back = this.getInputElement(idx - 1);
+                if (back) {
+                    back.focus();
+                }
+            }
+        }
     };
     /**
      * @param {?} idx
@@ -1195,7 +1276,7 @@ var NgxIpComponent = (function (_super) {
 NgxIpComponent.decorators = [
     { type: Component, args: [{
                 selector: 'ngx-ip-address',
-                template: "<div class=\"ngx-ip-address-container\" [ngClass]=\"containerClass\">\n  <div class=\"ngx-ip-address-table\" [@inputAnim]=\"inputAnim\">\n    <ng-template ngFor let-idx [ngForOf]=\"blocksRef\"; let-isLast=\"last\">\n      <div class=\"ngx-ip-address-table-cell\"\n           [class.ngx-ip-address-disabled]=\"isBlockDisabled(idx)\"\n           [ngClass]=\"{ 'ngx-ip-address-error': highlightInvalidBlocks && invalidBlocks[idx] }\">\n        <input #input\n               type=\"text\"\n               [required]=\"required\"\n               [readonly]=\"readonly\"\n               [value]=\"blocks[idx] || ''\"\n               (change)=\"onChange($event.target.value, idx)\"\n               (blur)=\"onBlur(idx)\"\n               (focus)=\"onFocus(idx)\"\n               [disabled]=\"isBlockDisabled(idx)\"\n               (paste)=\"onPaste($event, idx)\"\n               (copy)=\"onCopy($event, idx)\"\n               (keypress)=\"onKeyPress($event, idx)\"\n               (keyup)=\"onKeyUp($event, idx)\"/>\n      </div>\n      <span class=\"ngx-ip-address-table-cell ngx-ip-address-sep\">{{separatorMap[idx]}}</span>\n    </ng-template>\n  </div>\n\n  <div class=\"ngx-ip-address-copy-overlay\" *ngIf=\"resolveCopyMethod\">\n    <div class=\"ngx-ip-address-table\" [@copyAnim]=\"\">\n      <div class=\"ngx-ip-address-copy-title\">Copy?</div>\n      <a (click)=\"onCopyDecision('block')\">Block</a>\n      <a (click)=\"onCopyDecision('address')\">Address</a>\n    </div>\n  </div>\n</div>\n",
+                template: "<div class=\"ngx-ip-address-container\" [ngClass]=\"containerClass\">\n  <div class=\"ngx-ip-address-table\" [@inputAnim]=\"inputAnim\">\n    <ng-template ngFor let-idx [ngForOf]=\"blocksRef\"; let-isLast=\"last\">\n      <div class=\"ngx-ip-address-table-cell\"\n           [class.ngx-ip-address-disabled]=\"isBlockDisabled(idx)\"\n           [ngClass]=\"{ 'ngx-ip-address-error': highlightInvalidBlocks && invalidBlocks[idx] }\">\n        <input #input\n               type=\"text\"\n               [required]=\"required\"\n               [readonly]=\"readonly\"\n               [value]=\"blocks[idx] || ''\"\n               (change)=\"onChange($event.target.value, idx)\"\n               (blur)=\"onBlur(idx)\"\n               (focus)=\"onFocus(idx)\"\n               [disabled]=\"isBlockDisabled(idx)\"\n               (paste)=\"onPaste($event, idx)\"\n               (copy)=\"onCopy($event, idx)\"\n               (keypress)=\"onKeyPress($event, idx);onChange($event.target.value, idx)\"\n               (keyup)=\"onKeyUp($event, idx);onChange($event.target.value, idx)\"/>\n      </div>\n      <span class=\"ngx-ip-address-table-cell ngx-ip-address-sep\">{{separatorMap[idx]}}</span>\n    </ng-template>\n  </div>\n\n  <div class=\"ngx-ip-address-copy-overlay\" *ngIf=\"resolveCopyMethod\">\n    <div class=\"ngx-ip-address-table\" [@copyAnim]=\"\">\n      <div class=\"ngx-ip-address-copy-title\">Copy?</div>\n      <a (click)=\"onCopyDecision('block')\">Block</a>\n      <a (click)=\"onCopyDecision('address')\">Address</a>\n    </div>\n  </div>\n</div>\n",
                 styles: [".ngx-ip-address-container {\n  position: relative;\n  margin: 5px 0;\n  padding: 2px 0;\n  overflow: hidden;\n}\n\n.ngx-ip-address-copy-overlay {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n}\n\n.ngx-ip-address-copy-overlay .ngx-ip-address-table {\n  height: 100%;\n}\n\n.ngx-ip-address-copy-overlay .ngx-ip-address-table > * {\n  display: table-cell;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.ngx-ip-address-copy-title {\n  text-align: center;\n  vertical-align: middle;\n  font-size: 0.75em;\n}\n\n.ngx-ip-address-copy-overlay .ngx-ip-address-table > a {\n  border: 1px solid #9e9e9e;\n  cursor: pointer;\n}\n\n\n\n.ngx-ip-address-table {\n  display: inline-table;\n  flex-flow: column;\n  vertical-align: bottom;\n  width: 100%;\n}\n\n.ngx-ip-address-table-cell {\n  position: relative;\n  display: table-cell;\n  text-align: center;\n}\n\n.ngx-ip-address-table input {\n  text-align: center;\n  width: 100%;\n  box-sizing: border-box;\n}\n\n/* Default Theme */\n.ngx-ip-address-theme-default.ngx-ip-address-container {\n  border: 1px solid #26a69a;\n}\n\n\n.ngx-ip-address-theme-default .ngx-ip-address-table-cell {\n  transition: all 0.3s;\n}\n\n.ngx-ip-address-theme-default .ngx-ip-address-table input {\n  background: transparent;\n  border: none;\n  outline: none;\n}\n\n.ngx-ip-address-theme-default .ngx-ip-address-table-cell.ngx-ip-address-error {\n  box-shadow: 0 2px 15px 0 #F44336;\n}\n\n/* Boxed Theme */\n.ngx-ip-address-theme-boxed input {\n  transition: all 0.3s;\n}\n.ngx-ip-address-theme-boxed .ngx-ip-address-error:not(.ngx-ip-address-disabled) input {\n  border-color: #F44336;\n}\n\n\n/* MATERIAL THEME */\n.ngx-ip-address-theme-material.ngx-ip-address-container {\n  background-color: transparent;\n  border: none;\n  box-sizing: content-box;\n  transition: all 0.3s;\n  font-size: 1rem;\n}\n\n.ngx-ip-address-theme-material .ngx-ip-address-table-cell {\n  border-bottom: 1px solid #9e9e9e;\n  transition: all 0.3s;\n}\n\n.ngx-ip-address-theme-material.ngx-ip-address-focused .ngx-ip-address-table-cell:not(.ngx-ip-address-disabled) {\n  border-bottom: 1px solid #26a69a;\n  box-shadow: 0 1px 0 0 #26a69a;\n}\n\n\n.ngx-ip-address-theme-material .ngx-ip-address-table-cell.ngx-ip-address-error:not(.ngx-ip-address-disabled) {\n  box-shadow: 0 1px 0 0 #F44336;\n}\n\n.ngx-ip-address-theme-material .ngx-ip-address-table-cell.ngx-ip-address-disabled {\n  border-bottom: 1px dotted rgba(0,0,0,0.26);\n}\n\n.ngx-ip-address-theme-material input {\n  background: transparent;\n  border: none;\n  outline: none;\n\n  height: 3rem;\n  font-size: 1rem;\n  padding: 0;\n  box-shadow: none;\n}\n\n.ngx-ip-address-theme-material input[disabled] {\n  color: rgba(0,0,0,0.26);\n}\n"],
                 encapsulation: ViewEncapsulation.None,
                 changeDetection: ChangeDetectionStrategy.OnPush,
